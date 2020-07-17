@@ -24,7 +24,7 @@ class Spot:
 		self.x = row * width
 		self.y = col * width
 		self.color = WHITE
-		self.neighbors = []
+		self.neighbors = {}
 		self.width = width
 		self.total_rows = total_rows
 
@@ -71,32 +71,32 @@ class Spot:
 		pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
 
 	def update_neighbors(self, grid):
-		self.neighbors = []
+		self.neighbors = {}
 		if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier(): # DOWN
-			self.neighbors.append(grid[self.row + 1][self.col])
+			self.neighbors[grid[self.row + 1][self.col]] = "side"
 
 		if self.row > 0 and not grid[self.row - 1][self.col].is_barrier(): # UP
-			self.neighbors.append(grid[self.row - 1][self.col])
+			self.neighbors[grid[self.row - 1][self.col]] = "side"
 
 		if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].is_barrier(): # RIGHT
-			self.neighbors.append(grid[self.row][self.col + 1])
+			self.neighbors[grid[self.row][self.col + 1]] = "side"
 
 		if self.col > 0 and not grid[self.row][self.col - 1].is_barrier(): # LEFT
-			self.neighbors.append(grid[self.row][self.col - 1])
+			self.neighbors[grid[self.row][self.col - 1]] = "side"
 
 		if self.row < self.total_rows - 1 and self.col < self.total_rows - 1: # LOWER RIGHT
 			if not grid[self.row + 1][self.col + 1].is_barrier():
-				self.neighbors.append(grid[self.row + 1][self.col + 1])
+				self.neighbors[grid[self.row + 1][self.col + 1]] = "diagonal"
 
 		if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col - 1].is_barrier() and self.col > 0: # LOWER LEFT
-			self.neighbors.append(grid[self.row + 1][self.col - 1])
+			self.neighbors[grid[self.row + 1][self.col - 1]] = "diagonal"
 
 		if self.row > 0 and not grid[self.row - 1][self.col - 1].is_barrier() and self.col > 0: # UPPER LEFT
-			self.neighbors.append(grid[self.row - 1][self.col - 1])
+			self.neighbors[grid[self.row - 1][self.col - 1]] = "diagonal"
 
 		if self.row > 0 and self.col < self.total_rows - 1: # UPPER RIGHT
 			if not grid[self.row - 1][self.col + 1].is_barrier():
-				self.neighbors.append(grid[self.row - 1][self.col + 1])
+				self.neighbors[grid[self.row - 1][self.col + 1]] = "diagonal"
 
 	def __lt__(self, other):
 		return False
@@ -140,8 +140,11 @@ def algorithm(draw, grid, start, end):
 			end.make_end()
 			return True
 
-		for neighbor in current.neighbors:
-			temp_g_score = g_score[current] + 1
+		for neighbor in current.neighbors.keys():
+			if current.neighbors[neighbor] == "side":
+				temp_g_score = g_score[current] + 1
+			elif current.neighbors[neighbor] == "diagonal":
+				temp_g_score = g_score[current] + 1.4
 
 			if temp_g_score < g_score[neighbor]:
 				came_from[neighbor] = current
