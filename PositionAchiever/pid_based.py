@@ -40,7 +40,7 @@ class Dot:
 		plt.pause(dt)
 
 	def update_pos(self):
-		Kp_x = Kp_y = 1.2
+		Kp_x = Kp_y = 0.5
 		Kd_x = Kd_y = 0.0002
 		Ki_x = Ki_y = 0.001
 
